@@ -161,7 +161,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
                 doneText.setEnabled(enable ? true : false);
                 previewText.setEnabled(enable ? true : false);
                 if (enable) {
-                    doneText.setText(getString(R.string.done_num, selectImages.size(), maxSelectNum));
+//                    doneText.setText(getString(R.string.done_num, selectImages.size(), maxSelectNum));
                     previewText.setText(getString(R.string.preview_num, selectImages.size()));
                 } else {
                     doneText.setText(R.string.done);
