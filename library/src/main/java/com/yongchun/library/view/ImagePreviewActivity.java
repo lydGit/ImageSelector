@@ -21,6 +21,10 @@ import com.yongchun.library.R;
 import com.yongchun.library.model.LocalMedia;
 import com.yongchun.library.widget.PreviewViewPager;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +60,7 @@ public class ImagePreviewActivity extends AppCompatActivity {
 
     public static void startPreview(Activity context, List<LocalMedia> images, List<LocalMedia> selectImages, int maxSelectNum, int position) {
         Intent intent = new Intent(context, ImagePreviewActivity.class);
-        intent.putExtra(EXTRA_PREVIEW_LIST, (ArrayList) images);
+        EventBus.getDefault().postSticky(images);
         intent.putExtra(EXTRA_PREVIEW_SELECT_LIST, (ArrayList) selectImages);
         intent.putExtra(EXTRA_POSITION, position);
         intent.putExtra(EXTRA_MAX_SELECT_NUM, maxSelectNum);
@@ -68,12 +72,23 @@ public class ImagePreviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_image_preview);
+        EventBus.getDefault().register(this);
         initView();
         registerListener();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void getImageData(List<LocalMedia> imageList) {
+        images = imageList;
+    }
+
     public void initView() {
-        images = (List<LocalMedia>) getIntent().getSerializableExtra(EXTRA_PREVIEW_LIST);
         selectImages = (List<LocalMedia>) getIntent().getSerializableExtra(EXTRA_PREVIEW_SELECT_LIST);
         maxSelectNum = getIntent().getIntExtra(EXTRA_MAX_SELECT_NUM, 9);
         position = getIntent().getIntExtra(EXTRA_POSITION, 1);
@@ -214,11 +229,12 @@ public class ImagePreviewActivity extends AppCompatActivity {
         }
         isShowBar = !isShowBar;
     }
-    public void onDoneClick(boolean isDone){
+
+    public void onDoneClick(boolean isDone) {
         Intent intent = new Intent();
-        intent.putExtra(OUTPUT_LIST,(ArrayList)selectImages);
-        intent.putExtra(OUTPUT_ISDONE,isDone);
-        setResult(RESULT_OK,intent);
+        intent.putExtra(OUTPUT_LIST, (ArrayList) selectImages);
+        intent.putExtra(OUTPUT_ISDONE, isDone);
+        setResult(RESULT_OK, intent);
         finish();
     }
 }
