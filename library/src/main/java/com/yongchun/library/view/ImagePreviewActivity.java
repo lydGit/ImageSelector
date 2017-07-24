@@ -187,7 +187,7 @@ public class ImagePreviewActivity extends AppCompatActivity {
         boolean enable = selectImages.size() != 0;
         doneText.setEnabled(enable);
         if (enable) {
-            doneText.setText(getString(R.string.done_num, selectImages.size(), maxSelectNum));
+            doneText.setText(R.string.done);
         } else {
             doneText.setText(R.string.done);
         }
