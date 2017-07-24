@@ -125,7 +125,11 @@ public class LocalMediaLoader {
 
                 allImageFolder.setImages(allImages);
                 allImageFolder.setImageNum(allImageFolder.getImages().size());
-                allImageFolder.setFirstImagePath(allImages.get(0).getPath());
+                String firstImagePath = "";
+                if (allImages != null && !allImages.isEmpty()) {
+                    firstImagePath = allImages.get(0).getPath();
+                }
+                allImageFolder.setFirstImagePath(firstImagePath);
                 allImageFolder.setName(activity.getString(com.yongchun.library.R.string.all_image));
                 imageFolders.add(allImageFolder);
                 sortFolder(imageFolders);
