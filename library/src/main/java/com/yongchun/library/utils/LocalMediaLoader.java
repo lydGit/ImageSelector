@@ -110,7 +110,7 @@ public class LocalMediaLoader {
                         }
                     });
                     ArrayList<LocalMedia> images = new ArrayList<>();
-                    for (int i = 0; i < files.length; i++) {
+                    for (int i = files.length - 1; i >= 0; i--) {
                         File f = files[i];
                         LocalMedia localMedia = new LocalMedia(f.getAbsolutePath());
                         allImages.add(localMedia);
