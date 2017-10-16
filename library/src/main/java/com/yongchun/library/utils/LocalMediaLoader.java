@@ -13,7 +13,9 @@ import com.yongchun.library.model.LocalMediaFolder;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -110,8 +112,13 @@ public class LocalMediaLoader {
                         }
                     });
                     ArrayList<LocalMedia> images = new ArrayList<>();
-                    for (int i = files.length - 1; i >= 0; i--) {
-                        File f = files[i];
+                    Arrays.sort(files, new Comparator<File>() {
+                        @Override
+                        public int compare(File file, File t1) {
+                            return file.lastModified() - t1.lastModified() >=0 ? -1 : 1;
+                        }
+                    });
+                    for (File f : files) {
                         LocalMedia localMedia = new LocalMedia(f.getAbsolutePath());
                         allImages.add(localMedia);
                         images.add(localMedia);
