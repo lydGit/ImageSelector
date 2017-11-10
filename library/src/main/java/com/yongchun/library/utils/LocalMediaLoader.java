@@ -115,7 +115,14 @@ public class LocalMediaLoader {
                     Arrays.sort(files, new Comparator<File>() {
                         @Override
                         public int compare(File file, File t1) {
-                            return file.lastModified() - t1.lastModified() >=0 ? -1 : 1;
+//                            return file.lastModified() - t1.lastModified() >=0 ? -1 : 1;
+                              if(file.lastModified() > t1.lastModified()){
+                                  return 1;
+                              }else if(file.lastModified() < t1.lastModified()) {
+                                  return -1;
+                              }else{
+                                  return 0;
+                              }
                         }
                     });
                     for (File f : files) {
