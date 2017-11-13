@@ -9,7 +9,7 @@ public class LocalMedia implements Serializable {
     private String path;
     private long duration;
     private long lastUpdateAt;
-
+    private long createAt;
 
     public LocalMedia(String path, long lastUpdateAt, long duration) {
         this.path = path;
@@ -17,8 +17,9 @@ public class LocalMedia implements Serializable {
         this.lastUpdateAt = lastUpdateAt;
     }
 
-    public LocalMedia(String path) {
+    public LocalMedia(String path,long createAt) {
         this.path = path;
+        this.createAt = createAt;
     }
 
     public String getPath() {
@@ -42,5 +43,13 @@ public class LocalMedia implements Serializable {
     }
     public void setDuration(long duration) {
         this.duration = duration;
+    }
+
+    public long getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(long createAt) {
+        this.createAt = createAt;
     }
 }

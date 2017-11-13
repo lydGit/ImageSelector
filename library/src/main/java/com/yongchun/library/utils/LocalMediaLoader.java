@@ -7,13 +7,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 
 import com.yongchun.library.model.LocalMedia;
 import com.yongchun.library.model.LocalMediaFolder;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,7 +73,7 @@ public class LocalMediaLoader {
 
             @Override
             public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-                ArrayList<LocalMediaFolder> imageFolders = new ArrayList<LocalMediaFolder>();
+                List<LocalMediaFolder> imageFolders = new ArrayList<LocalMediaFolder>();
                 LocalMediaFolder allImageFolder = new LocalMediaFolder();
                 List<LocalMedia> allImages = new ArrayList<LocalMedia>();
 
@@ -88,6 +88,11 @@ public class LocalMediaLoader {
                     File parentFile = file.getParentFile();
                     if (parentFile == null || !parentFile.exists())
                         continue;
+
+                    //添加图片到所有图片选项下
+                    long addTime = data.getLong(data.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
+                    LocalMedia localMedia = new LocalMedia(path, addTime);
+                    allImages.add(localMedia);
 
                     String dirPath = parentFile.getAbsolutePath();
                     // 利用一个HashSet防止多次扫描同一个文件夹
@@ -104,31 +109,26 @@ public class LocalMediaLoader {
                     File[] files = parentFile.listFiles(new FilenameFilter() {
                         @Override
                         public boolean accept(File dir, String filename) {
-                            if (filename.endsWith(".jpg")
-                                    || filename.endsWith(".png")
-                                    || filename.endsWith(".jpeg"))
-                                return true;
-                            return false;
+                            return !TextUtils.isEmpty(filename) && (filename.toLowerCase().endsWith(".jpg")
+                                    || filename.toLowerCase().endsWith(".png") || filename.toLowerCase().endsWith(".jpeg"));
                         }
                     });
                     ArrayList<LocalMedia> images = new ArrayList<>();
                     Arrays.sort(files, new Comparator<File>() {
                         @Override
                         public int compare(File file, File t1) {
-//                            return file.lastModified() - t1.lastModified() >=0 ? -1 : 1;
-                              if(file.lastModified() > t1.lastModified()){
-                                  return 1;
-                              }else if(file.lastModified() < t1.lastModified()) {
-                                  return -1;
-                              }else{
-                                  return 0;
-                              }
+                            if (file.lastModified() > t1.lastModified()) {
+                                return -1;
+                            } else if (file.lastModified() < t1.lastModified()) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
                         }
                     });
                     for (File f : files) {
-                        LocalMedia localMedia = new LocalMedia(f.getAbsolutePath());
-                        allImages.add(localMedia);
-                        images.add(localMedia);
+                        LocalMedia localMedia2 = new LocalMedia(f.getAbsolutePath(), f.lastModified());
+                        images.add(localMedia2);
                     }
                     if (images.size() > 0) {
                         localMediaFolder.setImages(images);
@@ -136,7 +136,19 @@ public class LocalMediaLoader {
                         imageFolders.add(localMediaFolder);
                     }
                 }
-
+                //对全部图片进行排序,排序规则：时间＋路径名称
+                Collections.sort(allImages, new Comparator<LocalMedia>() {
+                    @Override
+                    public int compare(LocalMedia file, LocalMedia t1) {
+                        if (file.getCreateAt() > t1.getCreateAt()) {
+                            return -1;
+                        } else if (file.getCreateAt() < t1.getCreateAt()) {
+                            return 1;
+                        } else {
+                            return t1.getPath().compareTo(file.getPath());
+                        }
+                    }
+                });
                 allImageFolder.setImages(allImages);
                 allImageFolder.setImageNum(allImageFolder.getImages().size());
                 String firstImagePath = "";
