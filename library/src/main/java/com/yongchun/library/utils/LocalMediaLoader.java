@@ -89,11 +89,6 @@ public class LocalMediaLoader {
                     if (parentFile == null || !parentFile.exists())
                         continue;
 
-                    //添加图片到所有图片选项下
-                    long addTime = data.getLong(data.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
-                    LocalMedia localMedia = new LocalMedia(path, addTime);
-                    allImages.add(localMedia);
-
                     String dirPath = parentFile.getAbsolutePath();
                     // 利用一个HashSet防止多次扫描同一个文件夹
                     if (mDirPaths.contains(dirPath)) {
@@ -127,8 +122,9 @@ public class LocalMediaLoader {
                         }
                     });
                     for (File f : files) {
-                        LocalMedia localMedia2 = new LocalMedia(f.getAbsolutePath(), f.lastModified());
-                        images.add(localMedia2);
+                        LocalMedia localMedia = new LocalMedia(f.getAbsolutePath(), f.lastModified());
+                        allImages.add(localMedia);
+                        images.add(localMedia);
                     }
                     if (images.size() > 0) {
                         localMediaFolder.setImages(images);
@@ -140,9 +136,9 @@ public class LocalMediaLoader {
                 Collections.sort(allImages, new Comparator<LocalMedia>() {
                     @Override
                     public int compare(LocalMedia file, LocalMedia t1) {
-                        if (file.getCreateAt() > t1.getCreateAt()) {
+                        if (file.getLastUpdateAt() > t1.getLastUpdateAt()) {
                             return -1;
-                        } else if (file.getCreateAt() < t1.getCreateAt()) {
+                        } else if (file.getLastUpdateAt() < t1.getLastUpdateAt()) {
                             return 1;
                         } else {
                             return t1.getPath().compareTo(file.getPath());
